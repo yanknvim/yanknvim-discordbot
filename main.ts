@@ -12,12 +12,34 @@ const bot = createBot({
 });
 
 bot.events.messageCreate = (b, message) => {
-  if (message.content === "y!ping") {
+  if (message.content.startsWith("y!ping")) {
     const ping = Date.now() - message.timestamp;
     b.helpers.sendMessage(message.channelId, {
       content: `**Pong!**\nPing: ${ping}ms`
     })
   }
+  if (message.content.startsWith("y!dice")) {
+    const tmp = message.content.split(' ');
+    const prefix = (tmp.length >= 2) ? tmp[1].split('d') : [1, 6];
+
+    var total = 0;
+    var dices = [];
+    for (var i = 0; i < Number(prefix[0]); i++) {
+      const dice = Math.floor(Math.random() * Number(prefix[1])) + 1;
+      total += dice;
+      dices.push(dice);
+    }
+
+    b.helpers.sendMessage(message.channelId, {
+      content: `Result: ${total} (${dices.join(", ")})`
+    })
+  }
+  if (message.content.startsWith("y!help")) {
+    b.helpers.sendMessage(message.channelId, {
+      content: "- **y!ping**: Show ping\n- **y!dice**: Do diceroll(like 1d100)"
+    })
+  }
+
 };
 
 await startBot(bot);
